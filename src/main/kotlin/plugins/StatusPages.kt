@@ -19,6 +19,10 @@ fun Application.configureStatusPage(){
             call,cause->
             call.respond(HttpStatusCode.BadRequest, mapOf("errors" to cause.reasons))
         }
+        status(HttpStatusCode.TooManyRequests) {call,cause->
+            val retryAfter = call.response.headers["Retry-After"]
+            call.respondText("429: Too many requests. Wait for $retryAfter seconds.",status = cause)
+        }
 
         status(HttpStatusCode.Unauthorized) {call,cause->
             call.respondText("401: You are not authorized for this", status = HttpStatusCode.Unauthorized)
