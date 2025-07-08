@@ -8,6 +8,9 @@ import io.ktor.http.content.forEachPart
 import io.ktor.resources.Resource
 import io.ktor.server.application.*
 import io.ktor.server.application.install
+import io.ktor.server.plugins.ratelimit.RateLimit
+import io.ktor.server.plugins.ratelimit.RateLimitName
+import io.ktor.server.plugins.ratelimit.rateLimit
 import io.ktor.server.plugins.requestvalidation.RequestValidation
 import io.ktor.server.plugins.requestvalidation.ValidationResult
 import io.ktor.server.request.receive
@@ -36,6 +39,20 @@ fun Application.configureRouting() {
                 call.respondText ("Hi i am kawser")
             }
         }
+//        video 7
+    //        routing {
+//            rateLimit(RateLimitName("private")){
+//            post ("hello"){
+//                val remainingReq =call.response.headers["X-RateLimit-Remaining"]
+//                call.respondText("$remainingReq requests remaining")
+//            }}
+//            rateLimit(RateLimitName("public")){
+//                post ("hello1"){
+//                val remainingReq =call.response.headers["X-RateLimit-Remaining"]
+//                call.respondText("$remainingReq requests remaining")
+//            }}
+//
+//        }
     //Video 6
 //        routing {
 //            route("message1"){
