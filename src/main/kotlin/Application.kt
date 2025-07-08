@@ -1,5 +1,6 @@
 package com.example
 
+import com.example.plugins.configureRateLimit
 import com.example.plugins.configureRequestValidation
 import com.example.plugins.configureResources
 import com.example.plugins.configureRouting
@@ -14,6 +15,8 @@ fun main(args: Array<String>) {
 fun Application.module() {
     configureSerialization()
     configureResources()
+    //configureRateLimit should be before configureRouting
+    configureRateLimit()
     configureRouting()
     configureStatusPage()
     configureRequestValidation()
