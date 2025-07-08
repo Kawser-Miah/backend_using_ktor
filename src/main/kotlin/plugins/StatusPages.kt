@@ -3,8 +3,10 @@ package com.example.plugins
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
+import io.ktor.server.plugins.requestvalidation.RequestValidationException
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.plugins.statuspages.statusFile
+import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 
 fun Application.configureStatusPage(){
@@ -13,6 +15,10 @@ fun Application.configureStatusPage(){
 //            call,cause->
 //            call.respondText("500: ${cause.message}", status = HttpStatusCode.InternalServerError)
 //        }
+        exception<RequestValidationException>{
+            call,cause->
+            call.respond(HttpStatusCode.BadRequest, mapOf("errors" to cause.reasons))
+        }
 
         status(HttpStatusCode.Unauthorized) {call,cause->
             call.respondText("401: You are not authorized for this", status = HttpStatusCode.Unauthorized)
