@@ -7,6 +7,9 @@ import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
 import io.ktor.resources.Resource
 import io.ktor.server.application.*
+import io.ktor.server.application.install
+import io.ktor.server.plugins.requestvalidation.RequestValidation
+import io.ktor.server.plugins.requestvalidation.ValidationResult
 import io.ktor.server.request.receive
 import io.ktor.server.request.receiveChannel
 import io.ktor.server.request.receiveMultipart
@@ -33,23 +36,60 @@ fun Application.configureRouting() {
                 call.respondText ("Hi i am kawser")
             }
         }
-
-        routing {
-            post("products"){
-//                throw Exception("Database failed to initialize")
-
-                call.respond(HttpStatusCode.NotFound)
-//                call.respond(HttpStatusCode.BadRequest)
-            }
-
-            post("product"){
-                val product = call.receiveNullable<Product>() ?: return@post call.respond(
-                    HttpStatusCode.BadRequest)
-
-                call.respond(product)
-            }
-
-        }
+    //Video 6
+//        routing {
+//            route("message1"){
+//                install(RequestValidation){
+//                    validate<String> {body->
+//                        if (body.isBlank()) ValidationResult.Invalid("Body should not be empty")
+//                        else if(!body.startsWith("Hello")) ValidationResult.Invalid("Body should start with Hello")
+//                        else ValidationResult.Valid
+//                    }
+//
+//                }
+//                post {
+//                    val message = call.receive<String>()
+//                    call.respondText("Received message: $message")
+//                }
+//            }
+//
+//            route("message2"){
+//                install(RequestValidation){
+//                    validate<String> {body->
+//                        if (body.isBlank()) ValidationResult.Invalid("Body should not be empty")
+//                        else if(!body.startsWith("Hi")) ValidationResult.Invalid("Body should start with Hi")
+//                        else ValidationResult.Valid
+//                    }
+//
+//                }
+//                post {
+//                    val message = call.receive<String>()
+//                    call.respondText("Received message: $message")
+//                }
+//            }
+//            post("no") {
+//                val message = call.receive<String>()
+//                call.respondText("Received message: $message")
+//            }
+//
+//        }
+//video 5
+//        routing {
+//            post("products"){
+////                throw Exception("Database failed to initialize")
+//
+//                call.respond(HttpStatusCode.NotFound)
+////                call.respond(HttpStatusCode.BadRequest)
+//            }
+//
+//            post("product"){
+//                val product = call.receiveNullable<Product>() ?: return@post call.respond(
+//                    HttpStatusCode.BadRequest)
+//
+//                call.respond(product)
+//            }
+//
+//        }
 //video 4
 //        routing {
 //            //form data
