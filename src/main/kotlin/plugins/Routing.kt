@@ -1,6 +1,9 @@
 package com.example.plugins
 
 //import io.ktor.http.ContentType.*
+import io.ktor.http.ContentDisposition
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
@@ -8,6 +11,7 @@ import io.ktor.http.content.forEachPart
 import io.ktor.resources.Resource
 import io.ktor.server.application.*
 import io.ktor.server.application.install
+import io.ktor.server.http.content.LocalPathContent
 import io.ktor.server.plugins.ratelimit.RateLimit
 import io.ktor.server.plugins.ratelimit.RateLimitName
 import io.ktor.server.plugins.ratelimit.rateLimit
@@ -30,13 +34,81 @@ import java.io.File
 import java.io.FileOutputStream
 import io.ktor.server.request.receiveNullable
 import io.ktor.server.request.receiveParameters
+import java.nio.file.Path
+import kotlin.io.path.exists
 
 
 fun Application.configureRouting() {
     install(RoutingRoot){
         route ("/", HttpMethod.Get){
             handle {
-                call.respondText ("Hi i am kawser")
+                call.respondText ("Hi i am kawser",
+                    contentType = ContentType.Text.Plain,
+                    status = HttpStatusCode.OK)
+            }
+        }
+
+        routing {
+            get("products") {
+                val response = ProductResponse(
+                    message = "Successfully fetched product",
+                    data = List(10){Product(name = "Apple", price = 20, category = "Fruits")}
+                )
+                call.respond(response)
+            }
+
+            get("stream"){
+                val filename = call.request.queryParameters["filename"] ?: ""
+                val file = File("uploads/$filename")
+                if (!file.exists()) return@get call.respond(HttpStatusCode.NotFound)
+                call.respondFile(file)
+            }
+
+            get("downloads"){
+                val filename = call.request.queryParameters["filename"] ?: ""
+                val file = File("uploads/$filename")
+                if (!file.exists()) return@get call.respond(HttpStatusCode.NotFound)
+                call.response.header(
+                    HttpHeaders.ContentDisposition,
+                    ContentDisposition.Attachment.withParameter(
+                        ContentDisposition.Parameters.FileName,
+                        filename
+                    ).toString()
+                )
+
+                call.respondFile(file)
+            }
+
+            get("fileFromPath"){
+                val filename = call.request.queryParameters["filename"] ?: ""
+                val file = Path.of("uploads/$filename")
+                if (!file.exists()) return@get call.respond(HttpStatusCode.NotFound)
+                call.respond(LocalPathContent(file))
+            }
+
+            get("status"){
+                call.respond(HttpStatusCode.OK)
+            }
+            get("customStatus"){
+                call.response.status(HttpStatusCode(418,"I'm a teapot"))
+            }
+            get("headers"){
+                call.response.headers.append(HttpHeaders.ETag,"value")
+                call.response.header(HttpHeaders.ETag,"value1")
+                call.response.etag("value2")
+                call.respondText ("Headers")
+
+            }
+            get("cookies"){
+                call.response.cookies.append("new-cookie","new cookie value")
+                call.respond(HttpStatusCode.OK)
+            }
+
+            get("redirect"){
+                call.respondRedirect("moved",permanent = true)
+            }
+            get("moved"){
+                call.respondText("redirect to body")
             }
         }
 //        video 7
@@ -265,6 +337,12 @@ class Blogs(val sort:String? = "New"){
     @Resource("{id}")
     data class Blog(val parent: Blogs = Blogs(), val id: String)
 }
+
+@Serializable
+data class ProductResponse(
+    val message:String,
+    val data:List<Product>
+)
 
 @Serializable
 data class Product(
