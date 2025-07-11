@@ -1,6 +1,7 @@
 package com.example.plugins
 
 //import io.ktor.http.ContentType.*
+import io.ktor.http.CacheControl
 import io.ktor.http.ContentDisposition
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
@@ -12,6 +13,9 @@ import io.ktor.resources.Resource
 import io.ktor.server.application.*
 import io.ktor.server.application.install
 import io.ktor.server.http.content.LocalPathContent
+import io.ktor.server.http.content.staticFiles
+import io.ktor.server.http.content.staticResources
+import io.ktor.server.http.content.staticZip
 import io.ktor.server.plugins.ratelimit.RateLimit
 import io.ktor.server.plugins.ratelimit.RateLimitName
 import io.ktor.server.plugins.ratelimit.rateLimit
@@ -35,6 +39,7 @@ import java.io.FileOutputStream
 import io.ktor.server.request.receiveNullable
 import io.ktor.server.request.receiveParameters
 import java.nio.file.Path
+import java.nio.file.Paths
 import kotlin.io.path.exists
 
 
@@ -47,70 +52,106 @@ fun Application.configureRouting() {
                     status = HttpStatusCode.OK)
             }
         }
+        //video 9
+//        routing {
+//            staticResources("static","static"){
+//                extensions("html")
+//            }
+//            staticFiles("upload", File("uploads")){
+//                exclude { file->
+//                    file.path.contains("sample1")
+//                }
+//                contentType { file->
+//                    when(file.name){
+//                        "index.txt" -> ContentType.Text.Html
+//                        else -> null
+//                    }
+//                }
+//                cacheControl { file->
+//                    when(file.name){
+//                        "index.txt" -> listOf(Immutable,CacheControl.MaxAge(60))
+//                        else -> emptyList()
+//
+//                    }
+////                    listOf(CacheControl.MaxAge(60))
+//                }
+//                modify { file, call->
+//                    call.response.header("Filename",file.name)
+//                }
+//
+//
+//            }
+//
+//            staticZip("zips","uploads", zip = Paths.get("zips/uploads.zip"))
+//
+//        }
 
-        routing {
-            get("products") {
-                val response = ProductResponse(
-                    message = "Successfully fetched product",
-                    data = List(10){Product(name = "Apple", price = 20, category = "Fruits")}
-                )
-                call.respond(response)
-            }
 
-            get("stream"){
-                val filename = call.request.queryParameters["filename"] ?: ""
-                val file = File("uploads/$filename")
-                if (!file.exists()) return@get call.respond(HttpStatusCode.NotFound)
-                call.respondFile(file)
-            }
 
-            get("downloads"){
-                val filename = call.request.queryParameters["filename"] ?: ""
-                val file = File("uploads/$filename")
-                if (!file.exists()) return@get call.respond(HttpStatusCode.NotFound)
-                call.response.header(
-                    HttpHeaders.ContentDisposition,
-                    ContentDisposition.Attachment.withParameter(
-                        ContentDisposition.Parameters.FileName,
-                        filename
-                    ).toString()
-                )
-
-                call.respondFile(file)
-            }
-
-            get("fileFromPath"){
-                val filename = call.request.queryParameters["filename"] ?: ""
-                val file = Path.of("uploads/$filename")
-                if (!file.exists()) return@get call.respond(HttpStatusCode.NotFound)
-                call.respond(LocalPathContent(file))
-            }
-
-            get("status"){
-                call.respond(HttpStatusCode.OK)
-            }
-            get("customStatus"){
-                call.response.status(HttpStatusCode(418,"I'm a teapot"))
-            }
-            get("headers"){
-                call.response.headers.append(HttpHeaders.ETag,"value")
-                call.response.header(HttpHeaders.ETag,"value1")
-                call.response.etag("value2")
-                call.respondText ("Headers")
-
-            }
-            get("cookies"){
-                call.response.cookies.append("new-cookie","new cookie value")
-                call.respond(HttpStatusCode.OK)
-            }
-
-            get("redirect"){
-                call.respondRedirect("moved",permanent = true)
-            }
-            get("moved"){
-                call.respondText("redirect to body")
-            }
-        }
+//Video 8
+//        routing {
+//            get("products") {
+//                val response = ProductResponse(
+//                    message = "Successfully fetched product",
+//                    data = List(10){Product(name = "Apple", price = 20, category = "Fruits")}
+//                )
+//                call.respond(response)
+//            }
+//
+//            get("stream"){
+//                val filename = call.request.queryParameters["filename"] ?: ""
+//                val file = File("uploads/$filename")
+//                if (!file.exists()) return@get call.respond(HttpStatusCode.NotFound)
+//                call.respondFile(file)
+//            }
+//
+//            get("downloads"){
+//                val filename = call.request.queryParameters["filename"] ?: ""
+//                val file = File("uploads/$filename")
+//                if (!file.exists()) return@get call.respond(HttpStatusCode.NotFound)
+//                call.response.header(
+//                    HttpHeaders.ContentDisposition,
+//                    ContentDisposition.Attachment.withParameter(
+//                        ContentDisposition.Parameters.FileName,
+//                        filename
+//                    ).toString()
+//                )
+//
+//                call.respondFile(file)
+//            }
+//
+//            get("fileFromPath"){
+//                val filename = call.request.queryParameters["filename"] ?: ""
+//                val file = Path.of("uploads/$filename")
+//                if (!file.exists()) return@get call.respond(HttpStatusCode.NotFound)
+//                call.respond(LocalPathContent(file))
+//            }
+//
+//            get("status"){
+//                call.respond(HttpStatusCode.OK)
+//            }
+//            get("customStatus"){
+//                call.response.status(HttpStatusCode(418,"I'm a teapot"))
+//            }
+//            get("headers"){
+//                call.response.headers.append(HttpHeaders.ETag,"value")
+//                call.response.header(HttpHeaders.ETag,"value1")
+//                call.response.etag("value2")
+//                call.respondText ("Headers")
+//
+//            }
+//            get("cookies"){
+//                call.response.cookies.append("new-cookie","new cookie value")
+//                call.respond(HttpStatusCode.OK)
+//            }
+//
+//            get("redirect"){
+//                call.respondRedirect("moved",permanent = true)
+//            }
+//            get("moved"){
+//                call.respondText("redirect to body")
+//            }
+//        }
 //        video 7
     //        routing {
 //            rateLimit(RateLimitName("private")){
@@ -350,3 +391,7 @@ data class Product(
     val category:String,
     val price:Int,
 )
+object Immutable: CacheControl(null){
+    override fun toString():String{
+        return "immutable"
+    }}
