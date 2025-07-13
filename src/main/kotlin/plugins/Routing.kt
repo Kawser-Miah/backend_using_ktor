@@ -12,6 +12,7 @@ import io.ktor.http.content.forEachPart
 import io.ktor.resources.Resource
 import io.ktor.server.application.*
 import io.ktor.server.application.install
+import io.ktor.server.auth.authenticate
 import io.ktor.server.http.content.LocalPathContent
 import io.ktor.server.http.content.staticFiles
 import io.ktor.server.http.content.staticResources
@@ -52,6 +53,14 @@ fun Application.configureRouting() {
                     status = HttpStatusCode.OK)
             }
         }
+routing {
+    authenticate("auth-basic") {
+        get("hi"){
+            call.respondText("Hello world")
+        }
+    }
+
+}
         //video 9
 //        routing {
 //            staticResources("static","static"){
