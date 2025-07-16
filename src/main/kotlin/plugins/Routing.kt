@@ -53,12 +53,18 @@ fun Application.configureRouting() {
                     status = HttpStatusCode.OK)
             }
         }
-routing {
-    authenticate("auth-basic") {
-        get("hi"){
-            call.respondText("Hello world")
-        }
-    }
+        routing {
+            authenticate("digest-auth") {
+                get("hi"){
+                    call.respondText("Hello world")
+                }
+            }
+//routing {
+//    authenticate("auth-basic") {
+//        get("hi"){
+//            call.respondText("Hello world")
+//        }
+//    }
 
 }
         //video 9
