@@ -2,6 +2,7 @@ package com.example
 
 import com.example.plugins.configureAutoHeadResponse
 import com.example.plugins.configureBasicAuthentication
+import com.example.plugins.configureDigestAuthentication
 import com.example.plugins.configurePartialContent
 import com.example.plugins.configureRateLimit
 import com.example.plugins.configureRequestValidation
@@ -20,9 +21,10 @@ fun Application.module() {
     configureResources()
     //configureRateLimit should be before configureRouting
     configureRateLimit()
-    configureBasicAuthentication()
+//    configureBasicAuthentication()
+    configureDigestAuthentication()
     configureRouting()
-    configureStatusPage()
+//    configureStatusPage()
     configureRequestValidation()
     configureAutoHeadResponse()
     configurePartialContent()
